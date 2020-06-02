@@ -10,7 +10,7 @@
             <label for="user">User</label>
             <input type="text" id="user" name="user" value="${user}" readonly>
             </br>
-            <textarea id="message" name="message" rows="4" cols="50">Message here</textarea>
+            <textarea id="message" name="message" rows="4" cols="50" placeholder="message here"></textarea>
             </br>
             <input type="submit" value="Send">
         </form>

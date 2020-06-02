@@ -4,26 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.mvc.models.IncomingMessage;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 import org.mvc.models.Message;
+import org.mvc.models.IncomingMessage;
 
+@Component
 public class MessagesHandler {
-    private static MessagesHandler instance;
     private static int nextId = 0;
-    private static ConcurrentHashMap<Integer, Message> storage;
-
-    private MessagesHandler() {}
-
-    public static MessagesHandler getInstance() {
-        if(instance == null) {
-            instance = new MessagesHandler();
-            storage = new ConcurrentHashMap<>();
-        }
-
-        return instance;
-    }
+    private static ConcurrentHashMap<Integer, Message> storage = new ConcurrentHashMap<>();
 
     public HttpStatus addSingleMessage(IncomingMessage incomingMessage) {
         storage.put(nextId, new Message(nextId, incomingMessage.getUser(), incomingMessage.getMessage()));
