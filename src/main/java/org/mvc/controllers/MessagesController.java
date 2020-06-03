@@ -1,6 +1,7 @@
 package org.mvc.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.Objects;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,24 +18,28 @@ import org.mvc.models.SignIn;
 
 @RestController
 public class MessagesController {
-    @Autowired
     private MessagesHandler messagesHandler;
-    private static final String MESSAGES_PAGE = "messages";
-    private static final String USER_ATTRIBUTE = "user";
-    private static final String USERNAME_COOKIE = "username";
+    private static final String PAGE_MESSAGES = "messages";
+    private static final String MAV_ATTRIBUTE_USER = "user";
+    private static final String COOKIE_USERNAME = "username";
     private ModelAndView mav = new ModelAndView();
+
+    public MessagesController(MessagesHandler messagesHandler) {
+        Objects.requireNonNull(messagesHandler);
+        this.messagesHandler = messagesHandler;
+    }
 
     @PostMapping("/signin")
     public ModelAndView signIn(SignIn signIn, HttpServletResponse response) {
-        Cookie cookie = new Cookie(USERNAME_COOKIE, signIn.getUser());
+        Cookie cookie = new Cookie(COOKIE_USERNAME, signIn.getUser());
         cookie.setHttpOnly(true);
         cookie.setPath("/");
 
         response.addCookie(cookie);
 
-        mav.setViewName(MESSAGES_PAGE);
-        mav.addObject(USER_ATTRIBUTE, signIn.getUser());
-        mav.addObject(MESSAGES_PAGE, messagesHandler.getAllUnreadMessages());
+        mav.setViewName(PAGE_MESSAGES);
+        mav.addObject(MAV_ATTRIBUTE_USER, signIn.getUser());
+        mav.addObject(PAGE_MESSAGES, messagesHandler.getAllUnreadMessages());
         mav.setStatus(HttpStatus.OK);
 
         return mav;
@@ -42,7 +47,7 @@ public class MessagesController {
 
     @GetMapping("/messages")
     public ModelAndView getMessages(
-            @CookieValue("username") String username) {
+            @CookieValue(COOKIE_USERNAME) String username) {
         generateMessagesView(username);
         mav.setStatus(HttpStatus.OK);
 
@@ -52,7 +57,7 @@ public class MessagesController {
     @PostMapping("/messages")
     public ModelAndView addMessage(
             IncomingMessage incomingMessage,
-            @CookieValue("username") String username) {
+            @CookieValue(COOKIE_USERNAME) String username) {
         mav.setStatus(messagesHandler.addSingleMessage(incomingMessage));
         generateMessagesView(username);
 
@@ -60,7 +65,7 @@ public class MessagesController {
     }
 
     private void generateMessagesView(String username) {
-        mav.addObject(USER_ATTRIBUTE, username);
-        mav.addObject(MESSAGES_PAGE, messagesHandler.getAllUnreadMessages());
+        mav.addObject(MAV_ATTRIBUTE_USER, username);
+        mav.addObject(PAGE_MESSAGES, messagesHandler.getAllUnreadMessages());
     }
 }

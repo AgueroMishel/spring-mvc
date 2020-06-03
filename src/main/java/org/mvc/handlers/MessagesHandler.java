@@ -2,6 +2,7 @@ package org.mvc.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.http.HttpStatus;
@@ -12,12 +13,12 @@ import org.mvc.models.IncomingMessage;
 
 @Component
 public class MessagesHandler {
-    private static int nextId = 0;
+    private static AtomicInteger nextId = new AtomicInteger(0);
     private static ConcurrentHashMap<Integer, Message> storage = new ConcurrentHashMap<>();
 
     public HttpStatus addSingleMessage(IncomingMessage incomingMessage) {
-        storage.put(nextId, new Message(nextId, incomingMessage.getUser(), incomingMessage.getMessage()));
-        nextId++;
+        storage.put(nextId.get(), new Message(nextId.get(), incomingMessage.getUser(), incomingMessage.getMessage()));
+        nextId.addAndGet(1);
 
         return HttpStatus.CREATED;
     }
