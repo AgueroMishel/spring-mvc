@@ -4,9 +4,25 @@
         <title>Messages</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script>
+            let getNotify = function() {
+                let xhr = new XMLHttpRequest();
+                xhr.responseType = "json";
+                xhr.open("GET", "/notify", true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        console.log(xhr.response);
+                        if (xhr.response === true) {
+                            document.getElementById("getMessages").submit();
+                        }
+                    }
+                };
+                xhr.send();
+            }
+        </script>
     </head>
-    <body>
-        <form action="/messages" method="post">
+    <body onload="getNotify();">
+        <form id="postMessages" action="/messages" method="post">
             <label for="user">User</label>
             <input type="text" id="user" name="user" value="${user}" readonly>
             </br>
@@ -14,8 +30,8 @@
             </br>
             <input type="submit" value="Send">
         </form>
-        <form action="/messages" method="get">
-            <input type="submit" value="Get Messages">
+        <form id="getMessages" action="/messages" method="get">
+            <!--input type="submit" value="Get Messages"-->
         </form>
         <p>Messages</p>
         <table border=1>
