@@ -10,8 +10,8 @@
                 xhr.responseType = "json";
                 xhr.open("GET", "/notify", true);
                 xhr.onreadystatechange = function() {
-                    if (xhr.readyState === 4 && xhr.status === 200) {
-                        console.log(xhr.response);
+                    if (xhr.readyState === XMLHttpRequest.DONE 
+                        && xhr.status === 200) {
                         if (xhr.response === true) {
                             document.getElementById("getMessages").submit();
                         }

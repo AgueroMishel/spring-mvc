@@ -24,6 +24,8 @@ public class MessagesController {
     private static final String PAGE_MESSAGES = "messages";
     private static final String MAV_ATTRIBUTE_USER = "user";
     private static final String COOKIE_USER = "user";
+    private static final String COOKIE_SITE = "sameSite";
+    private static final String COOKIE_SITE_VALUE = "none";
     private ModelAndView mav = new ModelAndView();
     private static AtomicBoolean newMessages = new AtomicBoolean(false);
 
@@ -34,16 +36,10 @@ public class MessagesController {
 
     @PostMapping("/signin")
     public ModelAndView signIn(SignIn signIn, HttpServletResponse response) {
-        Cookie userCookie = new Cookie(COOKIE_USER, signIn.getUser());
-        userCookie.setSecure(true);
-        userCookie.setHttpOnly(true);
-        userCookie.setPath("/");
+        Cookie userCookie = createCookie(COOKIE_USER, signIn.getUser());
         response.addCookie(userCookie);
 
-        Cookie sameSiteCookie = new Cookie("sameSite", "none");
-        sameSiteCookie.setSecure(true);
-        sameSiteCookie.setHttpOnly(true);
-        sameSiteCookie.setPath("/");
+        Cookie sameSiteCookie = createCookie(COOKIE_SITE, COOKIE_SITE_VALUE);
         response.addCookie(sameSiteCookie);
 
         mav.setViewName(PAGE_MESSAGES);
@@ -55,8 +51,7 @@ public class MessagesController {
     }
 
     @GetMapping("/messages")
-    public ModelAndView getMessages(
-            @CookieValue(COOKIE_USER) String user) {
+    public ModelAndView getMessages(@CookieValue(COOKIE_USER) String user) {
         generateMessagesView(user);
         mav.setStatus(HttpStatus.OK);
 
@@ -85,6 +80,15 @@ public class MessagesController {
         } while (!newMessages.get());
 
         return true;
+    }
+
+    private Cookie createCookie(String name, String value) {
+        Cookie newCookie = new Cookie(name, value);
+        newCookie.setSecure(true);
+        newCookie.setHttpOnly(true);
+        newCookie.setPath("/");
+
+        return newCookie;
     }
 
     private void generateMessagesView(String user) {
